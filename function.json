@@ -1,0 +1,151 @@
+{
+  "type": "scalar.function",
+  "input_schema": {
+    "type": "object",
+    "description": "An image of a cat whose scene clarity will be evaluated. The function assesses how well the surrounding environment yields to the cat as the unambiguous subject of the photograph, considering background simplicity, subject distinction, and freedom from obstruction.",
+    "properties": {
+      "image": {
+        "type": "image",
+        "description": "The photograph containing a cat. The function evaluates the relationship between the cat and everything else in the frame — whether the background is clean and uncluttered, whether the cat is visually distinct from its surroundings, and whether the cat's form is fully visible and free from physical obstruction."
+      }
+    },
+    "required": [
+      "image"
+    ]
+  },
+  "tasks": [
+    {
+      "type": "vector.completion",
+      "skip": null,
+      "messages": [
+        {
+          "role": "user",
+          "content": [
+            {
+              "$jmespath": "input.image"
+            },
+            {
+              "type": "text",
+              "text": "Setting the cat aside, how would you describe the background and surrounding environment in this photograph? Is it clean and simple, or busy and cluttered?"
+            }
+          ]
+        }
+      ],
+      "responses": [
+        [
+          {
+            "type": "text",
+            "text": "The background is clean and simple. The space around the cat is calm, uncluttered, and visually restrained — nothing competes for the viewer's attention. The environment recedes quietly, serving as an unobtrusive canvas."
+          }
+        ],
+        [
+          {
+            "type": "text",
+            "text": "The background is moderately busy. There are some visual elements that draw the eye, but the environment is not overwhelmingly cluttered. A few objects or details are present, though they do not entirely dominate the scene."
+          }
+        ],
+        [
+          {
+            "type": "text",
+            "text": "The background is cluttered and chaotic. The environment is filled with competing objects, busy patterns, and visual noise that pull the viewer's attention in many directions at once. The scene is loud and crowded."
+          }
+        ]
+      ],
+      "output": {
+        "$starlark": "output['scores'][0] * 1.0 + output['scores'][1] * 0.5 + output['scores'][2] * 0.0"
+      }
+    },
+    {
+      "type": "vector.completion",
+      "skip": null,
+      "messages": [
+        {
+          "role": "user",
+          "content": [
+            {
+              "type": "text",
+              "text": "I need to evaluate the visual contrast between the cat and its surroundings in this photograph. Look closely at where the cat's body meets the background. Does the cat stand out distinctly, or does it blend into the environment?"
+            },
+            {
+              "$jmespath": "input.image"
+            }
+          ]
+        }
+      ],
+      "responses": [
+        [
+          {
+            "type": "text",
+            "text": "The cat stands out sharply from its surroundings. Strong differences in color, brightness, or texture create a clear boundary where the cat ends and the background begins. The cat is immediately separable from the scene — it pops forward and commands the eye."
+          }
+        ],
+        [
+          {
+            "type": "text",
+            "text": "The cat is somewhat distinguishable from its surroundings. There is moderate contrast — the cat is recognizable, but it shares enough visual similarity with its environment that the boundary between the two is softened in places."
+          }
+        ],
+        [
+          {
+            "type": "text",
+            "text": "The cat blends into its surroundings. Similar colors, matching patterns, or low brightness differences cause the cat to dissolve into the background. It is difficult to tell where the cat ends and the environment begins — the cat is absorbed into the scene rather than standing apart from it."
+          }
+        ]
+      ],
+      "output": {
+        "$starlark": "output['scores'][0] * 1.0 + output['scores'][1] * 0.5 + output['scores'][2] * 0.0"
+      }
+    },
+    {
+      "type": "vector.completion",
+      "skip": null,
+      "messages": [
+        {
+          "role": "system",
+          "content": [
+            {
+              "type": "text",
+              "text": "You are a photo editor evaluating cat photographs for a curated gallery. When shown a photograph, describe how fully visible the cat's body is — whether it is openly presented to the viewer or whether objects and elements in the scene partially hide or block it."
+            }
+          ]
+        },
+        {
+          "role": "user",
+          "content": [
+            {
+              "$jmespath": "input.image"
+            },
+            {
+              "type": "text",
+              "text": "How visible is the cat in this photograph? Is its body fully revealed, or is some part of it hidden or blocked by something in the scene?"
+            }
+          ]
+        }
+      ],
+      "responses": [
+        [
+          {
+            "type": "text",
+            "text": "The cat is fully visible. Its entire body is openly presented with nothing standing between the camera and the cat. The scene commits to showing the cat completely — no objects, surfaces, or elements obstruct the view."
+          }
+        ],
+        [
+          {
+            "type": "text",
+            "text": "The cat is partially visible. Some portions of its body are hidden behind objects, surfaces, or other elements in the scene, but the majority of the cat can still be seen and recognized."
+          }
+        ],
+        [
+          {
+            "type": "text",
+            "text": "The cat is mostly hidden. Significant portions of its body are obscured by objects or elements in the scene. Only a small part of the cat is visible — the scene has not committed to revealing the cat to the viewer."
+          }
+        ]
+      ],
+      "output": {
+        "$starlark": "output['scores'][0] * 1.0 + output['scores'][1] * 0.5 + output['scores'][2] * 0.0"
+      }
+    }
+  ],
+  "description": "Evaluates how well a photograph's scene yields to the cat as its unambiguous subject. Scores from 0 to 1 based on three qualities: background simplicity, visual distinction of the cat from its surroundings, and freedom from physical obstruction. Higher scores mean cleaner, more cooperative scenes."
+}
